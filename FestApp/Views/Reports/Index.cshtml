@@ -1,0 +1,135 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Звіти</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+
+    <header class="header">
+        <div class="logo">StreetArtFest</div>
+        <nav class="nav">
+            <a asp-controller="Home" asp-action="Index">Головна</a>
+            <a asp-controller="Admin" asp-action="Index">Адмінка</a>
+            <a asp-controller="Account" asp-action="Logout">Вийти</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Аналітика та звіти</h1>
+
+        <div class="section-box">
+            <h2>Оберіть звіт</h2>
+
+            <div class="action-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn small" onclick="loadReport('FestivalsByStatus')">Фестивалі за статусом</button>
+                <button class="btn small" onclick="loadReport('AverageRatings')">Середній рейтинг фестивалів</button>
+                <button class="btn small" onclick="loadReport('FestivalsWithoutReviews')">Фестивалі без відгуків</button>
+                <button class="btn small" onclick="loadReport('TopFestivals')">🔥 Топ-3 фестивалі</button>
+                <button class="btn small" onclick="loadReport('UsersByRole')">👥 Користувачі за ролями</button>
+                <button class="btn small" onclick="loadReport('FestivalsByCity')">📍 Фестивалі по містах</button>
+            </div>
+        </div>
+
+        <div class="section-box">
+            <h2>Результат аналітики</h2>
+            <div id="resultBox">
+                <p style="color: #666; font-style: italic;">Оберіть звіт зі списку вище, щоб згенерувати таблицю даних.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 StreetArtFest</p>
+    </footer>
+
+    <script>
+        function loadReport(action) {
+            const container = document.getElementById("resultBox");
+            container.innerHTML = "<p>Завантаження даних...</p>";
+
+            fetch(`/Reports/${action}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || data.length === 0) {
+                        container.innerHTML = "<p>За вказаним запитом даних не знайдено.</p>";
+                        return;
+                    }
+
+                    let html = `<table class="table">`;
+                    html += `<thead><tr>`;
+
+                    if (action === 'FestivalsByStatus') {
+                        html += `<th>Статус фестивалю</th><th style="text-align: right; padding-right: 40px;">Кількість</th>`;
+                    } else if (action === 'AverageRatings') {
+                        html += `<th>Назва фестивалю</th><th style="text-align: right; padding-right: 40px;">Середній рейтинг</th>`;
+                    } else if (action === 'FestivalsWithoutReviews') {
+                       
+                        html += `<th>ID</th><th>Назва фестивалю</th><th style="text-align: right; padding-right: 55px;">Місто</th>`;
+                    } else if (action === 'TopFestivals') {
+                        html += `<th>Назва фестивалю</th><th style="text-align: right; padding-right: 40px;">Подано заявок</th>`;
+                    } else if (action === 'UsersByRole') {
+                        html += `<th>Роль у системі</th><th style="text-align: right; padding-right: 40px;">Кількість користувачів</th>`;
+                    } else if (action === 'FestivalsByCity') {
+                        html += `<th>Місто</th><th style="text-align: right; padding-right: 40px;">Кількість фестивалів</th>`;
+                    }
+
+                    html += `</tr></thead><tbody>`;
+
+                    
+                    data.forEach(item => {
+                        html += `<tr>`;
+                        if (action === 'FestivalsByStatus') {
+                            html += `<td>${item.status}</td><td style="text-align: right; padding-right: 40px;"><b>${item.count}</b></td>`;
+                        } else if (action === 'AverageRatings') {
+                            let rating = item.avgRating ? item.avgRating.toFixed(1) : "0.0";
+                            html += `<td>${item.name}</td><td style="text-align: right; padding-right: 40px;"><b style="color: #ffb800;">★ ${rating}</b></td>`;
+                        } else if (action === 'FestivalsWithoutReviews') {
+                           
+                            html += `<td>${item.festivalId}</td><td>${item.name}</td><td style="text-align: right; padding-right: 55px;">${item.city}</td>`;
+                        } else if (action === 'TopFestivals') {
+                            html += `<td>${item.name}</td><td style="text-align: right; padding-right: 40px;"><b>${item.applicationsCount} заявки</b></td>`;
+                        } else if (action === 'UsersByRole') {
+                            html += `<td>${item.role}</td><td style="text-align: right; padding-right: 40px;"><b>${item.count}</b></td>`;
+                        } else if (action === 'FestivalsByCity') {
+                            html += `<td>${item.city}</td><td style="text-align: right; padding-right: 40px;"><b>${item.count}</b></td>`;
+                        }
+                        html += `</tr>`;
+                    });
+
+                    html += `</tbody></table>`;
+                    container.innerHTML = html;
+                })
+                .catch(err => {
+                    container.innerHTML = "<p style='color: red;'>Сталася помилка при завантаженні звіту.</p>";
+                    console.error(err);
+                });
+        }
+    </script>
+
+</body>
+</html>

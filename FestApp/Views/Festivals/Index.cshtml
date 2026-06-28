@@ -1,0 +1,147 @@
+﻿@model IEnumerable<FestApp.Models.Festival>
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Список фестивалів";
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+    <!DOCTYPE html>
+    <html lang="uk">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>@ViewData["Title"]</title>
+        <link rel="stylesheet" href="/style.css">
+    </head>
+
+<body class="@bodyClass">
+
+        <header class="header">
+            <div class="logo">StreetArtFest</div>
+            <nav class="nav">
+                <a asp-controller="Home" asp-action="Index">Головна</a>
+                <a asp-controller="Festivals" asp-action="Index">Фестивалі</a>
+
+              
+                @if (Context.Session.GetString("Role") == "Адміністратор")
+                {
+                    <a asp-controller="Reports" asp-action="Index">Звіти</a>
+                }
+
+                
+                @if (Context.Session.GetInt32("UserId") != null)
+                {
+                    @* *@
+                    <a asp-controller="Profile" asp-action="Index">Профіль</a>
+                    <a asp-controller="Account" asp-action="Logout">Вийти</a>
+                }
+                else
+                {
+                   
+                    <a asp-controller="Account" asp-action="Login">Вхід</a>
+                    <a asp-controller="Account" asp-action="Register" class="btn">Реєстрація</a>
+                }
+            </nav>
+        </header>
+
+        <main class="container">
+            <h1>Список фестивалів</h1>
+
+            <div class="filters">
+                <input type="text" id="searchInput" placeholder="Пошук за назвою або містом...">
+
+                <select id="statusFilter">
+                    <option value="">Усі статуси</option>
+                    <option value="Заплановано">Заплановано</option>
+                    <option value="Активний">Активний</option>
+                    <option value="Завершено">Завершено</option>
+                </select>
+                <select id="cityFilter">
+                    <option value="">Усі міста</option>
+                    <option value="Дніпро">Дніпро</option>
+                    <option value="Київ">Київ</option>
+                    <option value="Львів">Львів</option>
+                </select>
+            </div>
+
+            <div class="grid">
+                @foreach (var fest in Model)
+                {
+                    <div class="festival-card" data-status="@fest.Status" data-city="@fest.City">
+                        <h2>@fest.Name</h2>
+                        <p><b>Місто:</b> @fest.City</p>
+                        <p><b>Дата:</b> @fest.StartDate.ToShortDateString()</p>
+                        <p>
+                            <b>Статус:</b>@fest.Status</p>
+                    <p><b>Опис:</b> @fest.Description</p>
+                    <a href="/Festivals/Details/@fest.FestivalId" class="btn small">Детальніше</a>
+                </div>
+                                }
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>© 2026 StreetArtFest</p>
+            <h3>Контактна інформація</h3>
+            <p style="color:black">Наші фестивалі проходять у різних містах, реєструйтесь і обирайте подію для себе на найближчий час</p>
+            <p style="color:black">Якщо залишились питання - звертайтесь на нашу електронну адресу (streetartfest.@@gmail.com) або у будь-який зручний вам месенджер за цими номерами:<br> +38(0951234567)<br>+38(0504563412) </p>
+            <h3>Дякуємо, що обираєте нас!</h3>
+        </footer>
+
+        <script>
+            const searchInput = document.getElementById("searchInput");
+            const statusFilter = document.getElementById("statusFilter");
+            const cityFilter = document.getElementById("cityFilter");
+
+            function filterFestivals() {
+                const searchText = searchInput.value.toLowerCase();
+                const selectedStatus = statusFilter.value;
+                const selectedCity = cityFilter.value;
+
+            
+                const festivalCards = document.querySelectorAll(".festival-card");
+
+                festivalCards.forEach(card => {
+                    const title = card.querySelector("h2").innerText.toLowerCase();
+                    const city = card.getAttribute("data-city");
+                    const status = card.getAttribute("data-status");
+
+                    const matchesSearch = title.includes(searchText) || city.toLowerCase().includes(searchText);
+                    const matchesStatus = selectedStatus === "" || status === selectedStatus;
+                    const matchesCity = selectedCity === "" || city === selectedCity;
+
+                   
+                    if (matchesSearch && matchesStatus && matchesCity) {
+                        card.style.display = "";
+                    } else {
+                        
+                        card.style.display = "none";
+                    }
+                });
+            }
+
+            searchInput.addEventListener("input", filterFestivals);
+            statusFilter.addEventListener("change", filterFestivals);
+            cityFilter.addEventListener("change", filterFestivals);
+        </script>
+
+    </body>
+</html>

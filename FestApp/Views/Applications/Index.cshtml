@@ -1,0 +1,88 @@
+﻿@model IEnumerable<FestApp.Models.ArtistApplication>
+@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+    ViewData["Title"] = "Заявки артистів";
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявки артистів</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+<body class="@bodyClass">
+
+    <header class="header">
+        <div class="logo">StreetArtFest</div>
+        <nav class="nav">
+            <a asp-controller="Home" asp-action="Index">Головна</a>
+            <a asp-controller="Profile" asp-action="Index">Профіль</a>
+            
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Заявки артистів</h1>
+
+        <table class="table">
+            <tr>
+                <th>ID</th>
+                <th>Артист</th>
+                <th>Фестиваль</th>
+                <th>Тип</th>
+                <th>Коментар</th>
+                <th>Статус</th>
+                <th>Дії</th>
+            </tr>
+
+            @foreach (var app in Model)
+            {
+                <tr>
+                    <td>@app.ApplicationId</td>
+                    <td>@app.Artist.FullName</td>
+                    <td>@app.Festival.Name</td>
+                    <td>@app.ArtType</td>
+                    <td>@app.Comment</td>
+                    <td>@app.Status</td>
+                    <td>
+                        <a asp-controller="Applications" asp-action="Approve" asp-route-id="@app.ApplicationId" class="btn small">✔</a>
+                        <a asp-controller="Applications" asp-action="Reject" asp-route-id="@app.ApplicationId" class="btn small danger">✖</a>
+                    </td>
+                </tr>
+            }
+        </table>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 StreetArtFest</p>
+    </footer>
+
+</body>
+</html>

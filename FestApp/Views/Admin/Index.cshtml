@@ -1,0 +1,76 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+    ViewData["Title"] = "Адмін панель";
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Адмін панель</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+<body class="@bodyClass">
+
+    <header class="header">
+        <div class="logo">StreetArtFest</div>
+        <nav class="nav">
+            <a asp-controller="Home" asp-action="Index">Головна</a>
+            <a asp-controller="Festivals" asp-action="Index">Фестивалі</a>
+            <a asp-controller="Reports" asp-action="Index">Звіти</a>
+            <a asp-controller="Profile" asp-action="Index">Профіль</a>
+            <a asp-controller="Account" asp-action="Logout">Вийти</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Панель Керування</h1>
+
+        <div class="section-box">
+            <h2>Керування фестивалями</h2>
+
+            <a asp-controller="Admin" asp-action="CreateFestival" class="btn small">Додати фестиваль</a>
+            <a asp-controller="Admin" asp-action="Festivals" class="btn small">Переглянути всі</a>
+        </div>
+
+        <div class="section-box">
+            <h2>Керування локаціями</h2>
+
+            <a asp-controller="Admin" asp-action="CreateLocation" class="btn small">Додати локацію</a>
+            <a asp-controller="Admin" asp-action="Locations" class="btn small">Переглянути всі</a>
+        </div>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 StreetArtFest</p>
+    </footer>
+
+</body>
+</html>

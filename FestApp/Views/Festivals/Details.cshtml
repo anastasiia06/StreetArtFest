@@ -1,0 +1,271 @@
+﻿@model FestApp.Models.Festival
+@using FestApp.Models
+@using Microsoft.AspNetCore.Http
+
+@{
+    Layout = null; 
+    ViewData["Title"] = "Деталі фестивалю";
+
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+
+    <header class="header">
+        <div class="logo">StreetArtFest</div>
+        <nav class="nav">
+            <a asp-controller="Home" asp-action="Index">Головна</a>
+            <a asp-controller="Festivals" asp-action="Index">Фестивалі</a>
+
+
+            @if (Context.Session.GetString("Role") == "Адміністратор")
+            {
+                <a asp-controller="Reports" asp-action="Index">Звіти</a>
+            }
+
+
+            @if (Context.Session.GetInt32("UserId") != null)
+            {
+                @* *@
+                <a asp-controller="Profile" asp-action="Index">Профіль</a>
+                <a asp-controller="Account" asp-action="Logout">Вийти</a>
+            }
+            else
+            {
+
+                <a asp-controller="Account" asp-action="Login">Вхід</a>
+                <a asp-controller="Account" asp-action="Register" class="btn">Реєстрація</a>
+            }
+        </nav>
+    </header>
+
+    <main class="container">
+        @if (TempData["Error"] != null)
+        {
+            <div class="error-box">
+                @TempData["Error"]
+            </div>
+        }
+        <h1>@Model.Name</h1>
+
+        <div class="inf">
+            <p>
+                <b>Місто:</b> @Model.City <br>
+                <b>Дата:</b> @Model.StartDate.ToString("dd.MM.yyyy") - @Model.EndDate.ToString("dd.MM.yyyy") <br>
+                <b>Статус:</b> @Model.Status <br>
+                <b>Ціна:</b> @Model.Price грн
+            </p>
+        </div>
+
+        <div class="section-box">
+            <h2>Опис</h2>
+            <p>@Model.Description</p>
+        </div>
+
+        <div class="section-box">
+            <h2>Програма заходів</h2>
+            
+            @if (ViewBag.Role == "Організатор" && ViewBag.HasBooking == true)
+            {
+                <a asp-controller="Events"
+                   asp-action="Index"
+                   asp-route-festivalId="@Model.FestivalId"
+                   class="btn small">
+                    Керувати подіями
+                </a>
+            }
+
+            @if (ViewBag.Events != null)
+            {
+                <ul>
+                    @{
+                        var groupedEvents = ((List<FestApp.Models.FestivalEvent>)ViewBag.Events)
+                        .GroupBy(e => e.Location.Name);
+                    }
+
+                    @foreach (var locationGroup in groupedEvents)
+                    {
+                        <div class="event-location-block">
+                            <h3 style="margin-top:25px;">
+                                📍 @locationGroup.Key
+                            </h3>
+
+                            <ul>
+                                @foreach (var ev in locationGroup)
+                                {
+                                    <li>
+                                        @ev.DatetimeStart.ToString("dd.MM.yyyy HH:mm")
+                                        — <b>@ev.Title</b>
+
+                                        @if (ev.Artist != null)
+                                        {
+                                            <span class="artist-badge" style="color: #4f46e5; font-style: italic;">
+                                                (Артист: @ev.Artist.FullName)
+                                            </span>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>Немає подій для цього фестивалю.</p>
+            }
+        </div>
+
+        <div class="section-box">
+            <h2>Доступні локації</h2>
+            <p class="hint-text">
+                Локації доступні для організаторів фестивалю (керування розкладом та бронювання сцен).
+            </p>
+
+            @if (ViewBag.Locations != null)
+            {
+                <table class="table">
+                    <tr>
+                        <th>Локація</th>
+                        <th>Адреса</th>
+                        <th>Ціна бронювання</th>
+
+                        @if (role == "Організатор")
+                        {
+                            <th>Дія</th>
+                        }
+                    </tr>
+
+                    @foreach (Location loc in ViewBag.Locations)
+                    {
+                        <tr>
+                            <td>@loc.Name</td>
+                            <td>@loc.Address</td>
+                            <td>@loc.PriceLocation грн</td>
+
+                            @if (role == "Організатор")
+                            {
+                                <td>
+                                    <a class="btn small"
+                                       asp-controller="Booking"
+                                       asp-action="Create"
+                                       asp-route-festivalId="@Model.FestivalId"
+                                       asp-route-locationId="@loc.LocationId">
+                                        Забронювати
+                                    </a>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </table>
+            }
+            else
+            {
+                <p>Локацій поки немає.</p>
+            }
+        </div>
+
+       
+            
+
+            <div class="action-buttons">
+                @if (role == "Артист")
+{
+                <div class="section-box">
+                    <h2>Участь у фестивалі</h2>
+                    <a asp-controller="Applications"
+                       asp-action="Create"
+                       asp-route-festivalId="@Model.FestivalId"
+                       class="btn btn-action btn-blue">
+                        Подати заявку як артист
+                    </a>
+                    </div>
+                }
+               
+            </div>
+        </div>
+
+        <div class="section-box">
+            <h2>Відгуки відвідувачів</h2>
+
+            @if (ViewBag.Reviews != null)
+            {
+                @foreach (FestApp.Models.Review rev in ViewBag.Reviews)
+                {
+                    <div class="review">
+                        <p><b>@rev.Visitor.FullName</b></p>
+                        <p><b>Оцінка:</b> @rev.Rating/5</p>
+                        <p>@rev.Comment</p>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>Відгуків поки немає.</p>
+            }
+        </div>
+
+        <div class="section-box">
+            <h2>Залишити відгук</h2>
+
+            @if (role == "Відвідувач")
+            {
+                <form method="post" asp-controller="Reviews" asp-action="Create">
+                    <input type="hidden" name="FestivalId" value="@Model.FestivalId" />
+
+                    <label>Оцінка:</label>
+                    <select name="Rating">
+                        <option value="5">5/5</option>
+                        <option value="4">4/5</option>
+                        <option value="3">3/5</option>
+                        <option value="2">2/5</option>
+                        <option value="1">1/5</option>
+                    </select>
+
+                    <label>Коментар:</label>
+                    <textarea name="Comment" placeholder="Напишіть ваш відгук..."></textarea>
+
+                    <button type="submit" class="btn big">Надіслати відгук</button>
+                </form>
+            }
+            else
+            {
+                <p>Залишати відгуки можуть тільки користувачі з роллю <b>Відвідувач</b>.</p>
+            }
+        </div>
+      
+
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 StreetArtFest</p>
+    </footer>
+
+</body>
+</html>

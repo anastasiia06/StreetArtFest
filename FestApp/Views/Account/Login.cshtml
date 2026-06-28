@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "Вхід";
+    Layout = null;
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вхід</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+    <div class="hero-flags">
+        <img src="~/img/Святкова атм sphere з конфетті.png" alt="Flags">
+    </div>
+
+    <header class="header">
+        <div class="logo">StreetArtFest</div>
+        <nav class="nav">
+            <a href="/Home/Index">Головна</a>
+            <a href="/Festivals/Index">Фестивалі</a>
+            <a href="/Account/Register" class="btn">Реєстрація</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Вхід</h1>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+
+       
+
+        <form method="post" class="form">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="example@gmail.com" required>
+
+            <label>Пароль</label>
+            <input type="password" name="password" placeholder="********" required>
+
+            <button type="submit" class="btn big">Увійти</button>
+
+            <p style="margin-top:15px;">
+                Немає облікового запису?
+                <a href="/Account/Register" class="btn small">Зареєструватися</a>
+            </p>
+        </form>
+       
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 StreetArtFest</p>
+    </footer>
+
+</body>
+
+</html>

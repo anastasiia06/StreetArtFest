@@ -1,0 +1,190 @@
+﻿@model FestApp.Models.User
+@using FestApp.Models
+@using Microsoft.AspNetCore.Http
+
+@{
+    Layout = null;
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профіль</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+
+    <header class="header">
+        <div class="logo">StreetArtFest</div>
+
+        <nav class="nav">
+            <a asp-controller="Home" asp-action="Index">Головна</a>
+            <a asp-controller="Festivals" asp-action="Index">Фестивалі</a>
+
+            @if (role == "Адміністратор")
+            {
+                <a asp-controller="Reports" asp-action="Index">Звіти</a>
+            }
+
+            @if (role == "Адміністратор")
+            {
+                <a asp-controller="Admin" asp-action="Index">Адмін</a>
+            }
+
+            <a asp-controller="Profile" asp-action="Index">Профіль</a>
+            <a asp-controller="Account" asp-action="Logout">Вийти</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Профіль користувача</h1>
+
+        <div class="user-profile-card">
+            <h2 class="user-profile-title">Особисті дані</h2>
+
+            <div class="user-profile-item">
+                <b>Ім'я:</b>
+                <span>@Model.FullName</span>
+            </div>
+
+            <div class="user-profile-item">
+                <b>Email:</b>
+                <span>@Model.Email</span>
+            </div>
+
+            <div class="user-profile-item">
+                <b>Роль:</b>
+                <span>@role</span>
+            </div>
+
+            <a asp-controller="Account" asp-action="Logout" class="btn small btn-red">Вийти з профілю</a>
+        </div>
+
+        @if (role == "Відвідувач")
+        {
+            <div class="section-box">
+                <h2>Мої відгуки</h2>
+
+                @if (ViewBag.Reviews != null && ((List<Review>)ViewBag.Reviews).Count > 0)
+                {
+                    foreach (Review rev in ViewBag.Reviews)
+                    {
+                        <div class="review">
+                            <p><b>Фестиваль:</b> @rev.Festival.Name</p>
+                            <p><b>Оцінка:</b> @rev.Rating/5</p>
+                            <p>@rev.Comment</p>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>Ви ще не залишали відгуків.</p>
+                }
+            </div>
+        }
+
+        @if (role == "Артист")
+        {
+            <div class="section-box">
+                <h2>Мої заявки на фестивалі</h2>
+
+                @if (ViewBag.Applications != null && ((List<ArtistApplication>)ViewBag.Applications).Count > 0)
+                {
+                    <table class="table">
+                        <tr>
+                            <th>Фестиваль</th>
+                            <th>Тип мистецтва</th>
+                            <th>Статус</th>
+                        </tr>
+
+                        @foreach (ArtistApplication app in ViewBag.Applications)
+                        {
+                            <tr>
+                                <td>@app.Festival.Name</td>
+                                <td>@app.ArtType</td>
+                                <td>@app.Status</td>
+                            </tr>
+                        }
+                    </table>
+                }
+                else
+                {
+                    <p>У вас ще немає заявок.</p>
+                }
+            </div>
+        }
+
+        @if (role == "Організатор")
+        {
+            <div class="section-box">
+                <h2>Мої бронювання локацій</h2>
+
+                @if (ViewBag.Bookings != null && ((List<BookedLocation>)ViewBag.Bookings).Count > 0)
+                {
+                    <table class="table">
+                        <tr>
+                            <th>Фестиваль</th>
+                            <th>Локація</th>
+                            <th>Час</th>
+                        </tr>
+
+                        @foreach (BookedLocation b in ViewBag.Bookings)
+                        {
+                            <tr>
+                                <td>@b.Festival.Name</td>
+                                <td>@b.Location.Name</td>
+                                <td class="col-time">@b.DatetimeStart.ToString("dd.MM.yyyy HH:mm") - @b.DatetimeEnd.ToString("HH:mm")</td>
+                            </tr>
+                        }
+                    </table>
+                }
+                else
+                {
+                    <p>Бронювань ще немає.</p>
+                }
+
+                <a asp-controller="Applications" asp-action="Index" class="btn big">Переглянути заявки артистів</a>
+            </div>
+        }
+
+        @if (role == "Адміністратор")
+        {
+            <div class="section-box">
+                <h2>Адміністрування</h2>
+                <p>Ви маєте доступ до адміністрування системи та формування звітів.</p>
+
+                <div class="action-buttons">
+                    <a asp-controller="Admin" asp-action="Index" class="btn small">Адмінка</a>
+                    <a asp-controller="Reports" asp-action="Index" class="btn small">Звіти</a>
+                </div>
+            </div>
+        }
+
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 StreetArtFest</p>
+    </footer>
+
+</body>
+</html>

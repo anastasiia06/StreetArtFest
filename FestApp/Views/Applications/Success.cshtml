@@ -1,0 +1,78 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Успішно</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+
+    <header class="header">
+        <div class="logo">StreetArtFest</div>
+        <nav class="nav">
+            <a asp-controller="Home" asp-action="Index">Головна</a>
+            <a asp-controller="Festivals" asp-action="Index">Фестивалі</a>
+            <a asp-controller="Account" asp-action="Login">Вхід</a>
+            <a asp-controller="Account" asp-action="Register" class="btn">Реєстрація</a>
+        </nav>
+    </header>
+
+    <main class="container_s">
+        <div class="form" style="text-align:center;">
+            <h1 style="color:#0fa145;">✅ Заявка відправлена!</h1>
+            <p>Дякуємо! Організатор роздивиться вашу заявку найближчим часом.</p>
+
+            <div style="margin-top:20px;">
+                <p><b>Фестиваль:</b> @ViewBag.FestivalName</p>
+                <p><b>Дата:</b> @ViewBag.FestivalDate</p>
+                <p><b>Статус:</b> Подано</p>
+            </div>
+
+            <div style="margin-top:30px;">
+                <a asp-controller="Festivals" asp-action="Index" class="btn big">
+                    Повернутися до фестивалів
+                </a>
+            </div>
+
+        </div>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 StreetArtFest</p>
+    </footer>
+
+</body>
+
+</html>

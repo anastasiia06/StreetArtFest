@@ -1,0 +1,67 @@
+﻿@model IEnumerable<FestApp.Models.Location>
+@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Локації</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+
+    <main class="container">
+        <h1>Список локацій</h1>
+
+        <table class="table">
+            <tr>
+                <th>ID</th>
+                <th>Назва</th>
+                <th>Адреса</th>
+                <th>Ціна бронювання</th>
+                <th style="text-align: center;">Дії</th>
+            </tr>
+
+            @foreach (var loc in Model)
+            {
+                <tr>
+                    <td>@loc.LocationId</td>
+                    <td>@loc.Name</td>
+                    <td>@loc.Address</td>
+                    <td>@loc.PriceLocation.ToString("F2")</td>
+                    <td>
+                        <form asp-controller="Admin" asp-action="DeleteLocation" asp-route-id="@loc.LocationId" method="post" onsubmit="return confirm('Ви впевнені, що хочете видалити цю локацію?');" style="display:inline;">
+                            <button type="submit" class="btn small danger">Видалити</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </table>
+
+        <a asp-controller="Admin" asp-action="Index" class="btn big">Назад</a>
+    </main>
+
+</body>
+</html>

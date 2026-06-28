@@ -1,0 +1,102 @@
+﻿@model IEnumerable<FestApp.Models.FestivalEvent>
+
+@{
+    Layout = null;
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Події фестивалю</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+
+    <main class="container">
+
+        <h1>Події фестивалю</h1>
+
+        <a asp-controller="Events"
+           asp-action="Create"
+           asp-route-festivalId="@ViewBag.FestivalId"
+           class="btn big">
+            Додати подію
+        </a>
+
+        <table class="table">
+
+            <tr>
+                <th>Назва</th>
+                <th>Локація</th>
+                <th>Початок</th>
+                <th>Кінець</th>
+                <th>Дії</th>
+            </tr>
+
+            @foreach (var ev in Model)
+            {
+                <tr>
+                    <td>@ev.Title</td>
+                    <td>@ev.Location.Name</td>
+                    <td>
+                        @ev.DatetimeStart.ToString("dd.MM.yyyy HH:mm")
+                    </td>
+
+                    <td>
+                        @ev.DatetimeEnd.ToString("dd.MM.yyyy HH:mm")
+                    </td>
+
+                    <td>
+                        <a asp-action="Edit"
+                           asp-route-id="@ev.EventId"
+                           class="btn small">
+                            Редагувати
+                        </a>
+
+                        <a asp-action="Delete"
+                           asp-route-id="@ev.EventId"
+                           class="btn small btn-red">
+                            Видалити
+                        </a>
+                        <a asp-controller="Festivals"
+                           asp-action="Details"
+                           asp-route-id="@ViewBag.FestivalId">
+                           
+                        </a>
+                    </td>
+                </tr>
+            }
+
+        </table>
+        <div style="margin-top: 20px;">
+            <a asp-controller="Festivals" asp-action="Index" class="btn small" style="background: #6b7280;">Назад</a>
+        </div>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+    </main>
+
+</body>
+</html>

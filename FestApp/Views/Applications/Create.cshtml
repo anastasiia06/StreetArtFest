@@ -1,0 +1,87 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+    ViewData["Title"] = "Заявка на участь";
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявка на участь</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+    <header class="header">
+        <div class="logo">StreetArtFest</div>
+        <nav class="nav">
+            <a asp-controller="Home" asp-action="Index">Головна</a>
+            <a asp-controller="Festivals" asp-action="Index">Фестивалі</a>
+            <a asp-controller="Profile" asp-action="Index">Профіль</a>
+        </nav>
+    </header>
+
+    <main class="container2">
+        <div class="container-flags">
+            <img src="~/img/fl.png" alt="Flags" align="left">
+        </div>
+        <div class="container-flags">
+            <img src="~/img/fl.png" alt="Flags" align="right">
+        </div>
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div style="background-color: #ffdde0; color: #d9383a; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-weight: bold; border: 1px solid #d9383a; text-align: center;">
+                ⚠ @ViewBag.ErrorMessage
+            </div>
+        }
+        <h1>Заявка на участь</h1>
+        <p>Заповніть форму, щоб подати заявку на участь у фестивалі</p>
+
+        <form method="post" class="form">
+
+            <input type="hidden" name="festival_id" value="@ViewBag.FestivalId" />
+
+            <label>Напрям мистецтва</label>
+            <textarea name="artType" placeholder="Наприклад: Спів, Графіті, Танці..." required></textarea>
+
+            <label>Опис виступу та технічні потреби</label>
+            <textarea name="comment" placeholder="Коротко опишіть ваш виступ, а також технічні потреби (мікрофон, освітлення тощо)"></textarea>
+
+            <button type="submit" class="btn big">Надіслати заявку</button>
+
+        </form>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 StreetArtFest</p>
+    </footer>
+
+</body>
+
+</html>

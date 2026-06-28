@@ -1,0 +1,148 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+    ViewData["Title"] = "StreetArtFest";
+}
+
+
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreetArtFest</title>
+
+    <link rel="stylesheet" href="~/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+          rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="role-guest">
+
+    <header class="header">
+        <div class="logo">StreetArtFest</div>
+
+        <nav class="nav">
+            <a asp-controller="Home" asp-action="Index">Головна</a>
+            <a asp-controller="Festivals" asp-action="Index">Фестивалі</a>
+            @{
+                string role = Context.Session.GetString("Role") ?? "Guest";
+            }
+
+            @if (role == "Адміністратор")
+            {
+                <a asp-controller="Reports" asp-action="Index">Звіти</a>
+            }
+            @if (role == "Guest")
+            {
+                <a asp-controller="Account" asp-action="Login">Вхід</a>
+                <a asp-controller="Account" asp-action="Register" class="btn">Реєстрація</a>
+            }
+            else
+            {
+                <a asp-controller="Profile" asp-action="Index">Профіль</a>
+                <a asp-controller="Account" asp-action="Logout">Вийти</a>
+            }
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-flags">
+            <img src="~/img/Святкові прапорці та лампочка.png" alt="Flags">
+        </div>
+
+        <h1>StreetArtFest</h1>
+        <p>Платформа для міських фестивалів</p>
+        <p>Об’єднуємо артистів і відвідувачів для яскравих фестивалів.</p>
+
+        <a asp-controller="Festivals" asp-action="Index" class="btn big">
+            Переглянути фестивалі
+        </a>
+    </section>
+
+    <section class="features">
+        <div class="card">
+            <h2>Реєстрація учасників</h2>
+            <p>Артисти можуть подавати заявки та вказувати напрям мистецтва.</p>
+        </div>
+
+        <div class="card">
+            <h2>Бронювання локацій</h2>
+            <p>Організатори можуть керувати розкладом і уникати конфліктів.</p>
+        </div>
+
+        <div class="card">
+            <h2>Аналітика і звітність</h2>
+            <p>Звіти про статуси фестивалів, відвідуваність та активність учасників.</p>
+        </div>
+    </section>
+
+    <div class="section-box">
+        <h2>ЩО ВАРТО ЗНАТИ</h2>
+
+        <p style="text-align:center; max-width:800px; margin: 0 auto 30px;">
+            <b>StreetArtFest</b> — це платформа для організації вуличних мистецьких фестивалів.
+            Тут можна переглядати фестивалі, програму, локації та залишати відгуки після відвідування.<br>
+
+            ⚠️ Щоб подати заявку, бронювати локації або залишати відгуки — потрібно <b>зареєструватися</b> або увійти в акаунт.
+        </p>
+
+        <div class="info-cards">
+
+            <div class="info-card">
+                <div class="info-icon">🎨</div>
+                <h3>Артистам</h3>
+                <p>
+                    Подайте заявку на участь у фестивалі та станьте частиною мистецької програми.
+                    Поспішайте - місця у розкладі можуть бути обмежені.
+                </p>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon">📍</div>
+                <h3>Організаторам</h3>
+                <p>
+                    Бронюйте локації, плануйте події, керуйте заявками артистів та створюйте програму фестивалю.
+                </p>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon">🎟️</div>
+                <h3>Відвідувачам</h3>
+                <p>
+                    Переглядайте фестивалі та відгуки. Квитки можна придбати у день фестивалю на касі
+                    та обміняти на браслет для входу.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 StreetArtFest</p>
+
+        <h3>Контактна інформація</h3>
+        <p style="color:black">
+            Наші фестивалі проходять у різних містах, реєструйтесь і обирайте подію для себе на найближчий час
+        </p>
+
+        <p style="color:black">
+            Якщо залишились питання - звертайтесь на нашу електронну адресу (streetartfest@gmail.com)
+            або у будь-який зручний вам месенджер за цими номерами:<br>
+            +38(0951234567)<br>
+            +38(0504563412)
+        </p>
+
+        <h3>Дякуємо, що обираєте нас!</h3>
+    </footer>
+
+</body>
+
+</html>

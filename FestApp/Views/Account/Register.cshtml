@@ -1,0 +1,89 @@
+﻿@{
+    ViewData["Title"] = "Реєстрація";
+    Layout = null;
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реєстрація</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+    <div class="hero-flags">
+        <img src="~/img/Святкова атм sphere з конфетті.png" alt="Flags">
+    </div>
+
+    <header class="header">
+        <div class="logo">StreetArtFest</div>
+        <nav class="nav">
+            <a href="/Home/Index">Головна</a>
+            <a href="/Festivals/Index">Фестивалі</a>
+            <a href="/Account/Login">Вхід</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Реєстрація</h1>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+
+        @if (ViewBag.Error != null)
+        {
+            <p style="color:black;">@ViewBag.Error</p>
+        }
+
+        <form method="post" class="form">
+            <label>Ім'я</label>
+            <input type="text" name="fullName" placeholder="Ваше ім'я" required>
+
+            <label>Email</label>
+            <input type="email" name="email" placeholder="example@gmail.com" required>
+
+            <label>Пароль</label>
+            <input type="password" name="password" placeholder="********" required>
+
+            <label>Телефон</label>
+            <input type="text" name="phone" placeholder="+380..." required>
+
+            <label>Роль</label>
+            <select name="role">
+                <option value="Відвідувач">Відвідувач</option>
+                <option value="Артист">Артист</option>
+                <option value="Організатор">Організатор</option>
+            </select>
+
+            <button type="submit" class="btn big">Зареєструватися</button>
+
+            <p style="margin-top:15px;">
+                Вже є обліковий запис?
+                <a href="/Account/Login" class="btn small">Увійти</a>
+            </p>
+        </form>
+       
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 StreetArtFest</p>
+    </footer>
+
+</body>
+
+</html>

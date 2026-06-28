@@ -1,0 +1,88 @@
+﻿@model IEnumerable<FestApp.Models.Festival>
+
+@{
+    Layout = null;
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фестивалі</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+
+    <header class="header">
+        <div class="logo">StreetArtFest</div>
+        <nav class="nav">
+            @if (role == "Адміністратор" )
+            {
+                <a asp-controller="Admin" asp-action="Index">Адмін</a>
+            }
+
+            <a asp-controller="Profile" asp-action="Index">Профіль</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Список фестивалів</h1>
+        <table class="table">
+            <tr>
+                <th>ID</th>
+                <th>Назва</th>
+                <th>Місто</th>
+                <th>Дата початку</th>
+                <th>Дата кінця</th>
+                <th>Статус</th>
+                <th style="text-align: center;">Дії</th>
+            </tr>
+
+            @foreach (var fest in Model.OrderByDescending(f => f.StartDate))
+            {
+                <tr>
+                    <td>@fest.FestivalId</td>
+                    <td>@fest.Name</td>
+                    <td>@fest.City</td>
+                    <td>@fest.StartDate.ToString("dd.MM.yyyy")</td>
+                    <td>@fest.EndDate.ToString("dd.MM.yyyy")</td>
+                    <td>@fest.Status</td>
+                    <td>
+                        <form asp-controller="Admin" asp-action="DeleteFestival" asp-route-id="@fest.FestivalId" method="post" onsubmit="return confirm('Ви впевнені, що хочете видалити цей фестиваль та всі його дані з бази даних?');" style="display:inline;">
+                            <button type="submit" class="btn small danger">Видалити</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </table>
+
+        <a asp-controller="Admin" asp-action="Index" class="btn big">Назад</a>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+    </main>
+
+</body>
+</html>

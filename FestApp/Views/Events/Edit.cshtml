@@ -1,0 +1,93 @@
+﻿@model FestApp.Models.FestivalEvent
+
+@{
+    Layout = null;
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Редагування події</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+
+    <main class="container">
+
+        <h1>Редагування події</h1>
+
+        <form method="post" class="form">
+
+            <input type="hidden" asp-for="EventId" />
+            <input type="hidden" asp-for="FestivalId" />
+
+            <label>Назва</label>
+            <input asp-for="Title" />
+            <label>Артист (необов'язково)</label>
+            <select asp-for="ArtistId" class="form-control">
+                <option value="">-- Оберіть артиста --</option>
+                @foreach (var artist in ViewBag.Artists)
+                {
+                    <option value="@artist.UserId">@artist.FullName</option>
+                }
+            </select>
+            <label>Локація</label>
+
+            <select asp-for="LocationId">
+
+                @foreach (var loc in ViewBag.Locations)
+                {
+                    <option value="@loc.LocationId">
+                        @loc.Name
+                    </option>
+                }
+
+            </select>
+            <label>Початок</label>
+            <input asp-for="DatetimeStart"
+                   type="datetime-local" />
+
+            <label>Кінець</label>
+            <input asp-for="DatetimeEnd"
+                   type="datetime-local" />
+
+            <button type="submit" class="btn big">
+                Зберегти
+            </button>
+            <a asp-controller="Festivals"
+               asp-action="Details"
+               asp-route-id="@ViewBag.FestivalId"
+               class="btn small">
+                Назад
+            </a>
+
+        </form>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+    </main>
+
+</body>
+</html>

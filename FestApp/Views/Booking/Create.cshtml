@@ -1,0 +1,77 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+    ViewData["Title"] = "Бронювання локації";
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+
+    <header class="header">
+        <div class="logo">StreetArtFest</div>
+        <nav class="nav">
+            <a asp-controller="Home" asp-action="Index">Головна</a>
+            <a asp-controller="Festivals" asp-action="Index">Фестивалі</a>
+            <a asp-controller="Account" asp-action="Profile">Профіль</a>
+            <a asp-controller="Account" asp-action="Logout">Вийти</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Бронювання локації</h1>
+        @if (ViewBag.Error != null)
+        {
+            <p style="color:red; font-weight:bold;">@ViewBag.Error</p>
+        }
+        <form method="post" asp-controller="Booking" asp-action="Create" class="form">
+
+            <input type="hidden" name="festivalId" value="@ViewBag.FestivalId" />
+            <input type="hidden" name="locationId" value="@ViewBag.LocationId" />
+
+            <label>Дата та час початку</label>
+            <input type="datetime-local" name="datetimeStart" required />
+
+            <label>Дата та час завершення</label>
+            <input type="datetime-local" name="datetimeEnd" required />
+
+            <button type="submit" class="btn big">Підтвердити бронювання</button>
+        </form>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 StreetArtFest</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+﻿@model FestApp.Models.Location
+@using Microsoft.AspNetCore.Http
+
+@{
+    Layout = null;
+    string cleanRole = (Context.Session.GetString("Role") ?? "Guest").Trim().ToLower();
+    string role = cleanRole switch
+    {
+        "адміністратор" or "admin" => "Адміністратор",
+        "відвідувач" or "visitor" => "Відвідувач",
+        "артист" or "artist" => "Артист",
+        "організатор" or "organizer" => "Організатор",
+        _ => "Guest"
+    };
+    string bodyClass = cleanRole switch
+    {
+        "адміністратор" or "admin" => "role-admin",
+        "відвідувач" or "visitor" => "role-visitor",
+        "артист" or "artist" => "role-artist",
+        "організатор" or "organizer" => "role-organizer",
+        _ => "role-guest"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Додати локацію</title>
+    <link rel="stylesheet" href="~/style.css">
+</head>
+
+<body class="@bodyClass">
+    <main class="container">
+        <h1>Додати локацію</h1>
+
+        <form method="post" class="form">
+
+            <label>Назва</label>
+            <input asp-for="Name" />
+
+            <label>Адреса</label>
+            <input asp-for="Address" />
+
+            <label>Ціна бронювання</label>
+            <input asp-for="PriceLocation" type="number" />
+
+            <button type="submit" class="btn big">Зберегти</button>
+        </form>
+
+        <a asp-controller="Admin" asp-action="Index" class="btn small">Назад</a>
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+    </main>
+
+</body>
+</html>
