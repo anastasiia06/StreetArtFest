@@ -51,3 +51,18 @@ Database functionality includes:
 
 Developed by Anastasiia Petrova.
 
+### Home page
+
+![Home](home.png)
+
+### Reports
+
+![Reports](analythics.png)
+
+### Profile
+
+![Profile](profile.png)
+
+### Fest Page
+
+![Fest](fest.png)
