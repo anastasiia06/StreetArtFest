@@ -74,3 +74,23 @@ Developed by Anastasiia Petrova.
 ### Діаграма варіантів використання системи адміністратором
 
 ![Diagram2](diagram2.jpg)
+
+### Сторінка “Вхід”
+
+![login](login.png)
+
+### Профіль користувача з роллю “Організатор”
+
+![organizer](organizer.png)
+
+### Панель керування заявками артистів
+
+![applications](applications.png)
+
+### Подання заявки на участь у фестивалі
+
+![apply](apply.png)
+
+### Форма бронювання локації
+
+![booking](booking.png)
