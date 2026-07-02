@@ -53,44 +53,44 @@ Developed by Anastasiia Petrova.
 
 ### Home page
 
-![Home](home.png)
+![Home](images/home.png)
 
 ### Reports
 
-![Reports](analythics.png)
+![Reports](images/analythics.png)
 
 ### Profile
 
-![Profile](profile.png)
+![Profile](images/profile.png)
 
 ### Fest Page
 
-![Fest](fest.png)
+![Fest](images/fest.png)
 
 ### Діаграма варіантів використання системи відвідувачем, артистом та організатором
 
-![Diagram1](diagram1.jpg)
+![Diagram1](images/diagram1.jpg)
 
 ### Діаграма варіантів використання системи адміністратором
 
-![Diagram2](diagram2.jpg)
+![Diagram2](images/diagram2.jpg)
 
 ### Сторінка “Вхід”
 
-![login](login.png)
+![login](images/login.png)
 
 ### Профіль користувача з роллю “Організатор”
 
-![organizer](organizer.png)
+![organizer](images/organizer.png)
 
 ### Панель керування заявками артистів
 
-![applications](applications.png)
+![applications](images/applications.png)
 
 ### Подання заявки на участь у фестивалі
 
-![apply](apply.png)
+![apply](images/apply.png)
 
 ### Форма бронювання локації
 
-![booking](booking.png)
+![booking](images/booking.png)
