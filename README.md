@@ -66,3 +66,11 @@ Developed by Anastasiia Petrova.
 ### Fest Page
 
 ![Fest](fest.png)
+
+### Діаграма варіантів використання системи відвідувачем, артистом та організатором
+
+![Diagram1](diagram1.jpg)
+
+### Діаграма варіантів використання системи адміністратором
+
+![Diagram2](diagram2.jpg)
