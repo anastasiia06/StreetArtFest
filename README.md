@@ -51,6 +51,14 @@ Database functionality includes:
 
 Developed by Anastasiia Petrova.
 
+### Діаграма варіантів використання системи відвідувачем, артистом та організатором
+
+![Diagram1](images/diagram1.jpg)
+
+### Діаграма варіантів використання системи адміністратором
+
+![Diagram2](images/diagram2.jpg)
+
 ### Home page
 
 ![Home](images/home.png)
@@ -67,13 +75,6 @@ Developed by Anastasiia Petrova.
 
 ![Fest](images/fest.png)
 
-### Діаграма варіантів використання системи відвідувачем, артистом та організатором
-
-![Diagram1](images/diagram1.jpg)
-
-### Діаграма варіантів використання системи адміністратором
-
-![Diagram2](images/diagram2.jpg)
 
 ### Сторінка “Вхід”
 
